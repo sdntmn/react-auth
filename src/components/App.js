@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { Route, Switch, Router, Redirect, useHistory } from "react-router-dom";
+import { Route, Switch, Redirect, useHistory } from "react-router-dom";
 // Popup-ы =================================================================
 import AddPlacePopup from "./AddPlacePopup";
 import EditProfilePopup from "./EditProfilePopup";
@@ -151,19 +151,15 @@ function App() {
 
   const history = useHistory();
 
-  // Состояние пользователя — авторизирован или нет. Изначально - нет (False)
+  // Состояние пользователя — авторизован или нет. Изначально - нет (False)
   const [loggedIn, setLoggedIn] = useState(false);
   const [email, setEmail] = useState({});
-
-  //const [userData, setUserData] = useState({});
 
   // Первоначальное состояние InfoToolTip ==================================
   const [infoTool, setInfoTool] = useState(false);
 
   const authToken = async (jwt) => {
     return auth.getToken(jwt).then((res) => {
-      console.log(res.data.email);
-
       if (res) {
         setLoggedIn(true);
         setEmail(res.data.email);
@@ -177,7 +173,7 @@ function App() {
     if (jwt) {
       authToken(jwt); //функция авторизации
     }
-  }, [loggedIn]);
+  });
 
   const [message, setMessage] = useState("");
   const [image, setImage] = useState(false);
@@ -190,6 +186,13 @@ function App() {
         setMessage("Вы успешно зарегистрировались");
         setImage(true);
         setInfoTool(true);
+
+        setTimeout(function () {
+          closeAllPopups();
+        }, 2000);
+
+        history.push("/sign-in");
+
         return res;
       })
       .catch((error) => {
@@ -208,7 +211,6 @@ function App() {
     auth
       .authorize(email, password)
       .then((res) => {
-        console.log(res.data);
         if (res.token) {
           setLoggedIn(true);
           setEmail(email);
@@ -216,7 +218,6 @@ function App() {
           localStorage.setItem("jwt", res.token);
           history.push("/");
         }
-        console.log(res);
       })
       .catch((error) => {
         console.log(error);
@@ -262,6 +263,9 @@ function App() {
           <Route path="/sign-up">
             <Register onRegister={onRegister} />
           </Route>
+          <Route>
+            {loggedIn ? <Redirect to="/" /> : <Redirect to="/sign-in" />}
+          </Route>
         </Switch>
         <Footer />
 
@@ -299,21 +303,3 @@ function App() {
 }
 
 export default App;
-/*
-<Route>
-  {loggedIn ? (
-    <Redirect to="/" /> && (
-      <Header
-        email={email}
-        btnLink="Выйти"
-        pathLink="/sign-in"
-        onEndSession={onSignOut}
-      />
-    )
-  ) : (
-    <Redirect to="./sign-in" />
-  )}
-</Route>;
-
-   //  <Footer />
-*/
