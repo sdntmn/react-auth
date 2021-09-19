@@ -153,7 +153,7 @@ function App() {
 
   // Состояние пользователя — авторизован или нет. Изначально - нет (False)
   const [loggedIn, setLoggedIn] = useState(false);
-  const [email, setEmail] = useState({});
+  const [email, setEmail] = useState("");
 
   // Первоначальное состояние InfoToolTip ==================================
   const [infoTool, setInfoTool] = useState(false);
@@ -228,6 +228,7 @@ function App() {
   function onSignOut() {
     localStorage.removeItem("jwt");
     setLoggedIn(false);
+    history.push("/sign-in");
   }
 
   return (
