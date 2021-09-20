@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Header from "./Header";
-import Footer from "./Footer";
 import Form from "./Form";
 
 function Login({ onLogin }) {
@@ -30,7 +29,6 @@ function Login({ onLogin }) {
         onSubmit={handleSubmit}
         onChange={handleChange}
       ></Form>
-      <Footer />
     </div>
   );
 }
