@@ -8,16 +8,13 @@ export default function EditProfilePopup({ isOpen, onClose, onUpdateUser }) {
   const [description, setDescription] = useState("");
 
   const currentUser = useContext(CurrentUserContext);
-  //сделать что-то после рендера
-  useEffect(() => {
-    setName("");
-    setDescription("");
-  }, [isOpen]);
 
   useEffect(() => {
     setName(currentUser.name);
     setDescription(currentUser.about);
-  }, [currentUser]);
+  }, [currentUser, isOpen]);
+  /* Нужно еще следить за isOpen (за состоянием открытия), чтобы вставлять в инпуты данные пользователя, иначе, если мы удалим информацию из инпутов и просто закроем попап, то при следующем открытии инпуты будут пустые (без данных пользователя)
+   */
 
   // Обработчик изменения инпута обновляет стейт
   function handleChangeInputName(evt) {

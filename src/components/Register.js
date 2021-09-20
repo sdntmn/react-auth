@@ -1,6 +1,5 @@
 import React, { useState } from "react";
 import Header from "./Header";
-import Footer from "./Footer";
 import FormLinkEnter from "./FormLinkEnter";
 import Form from "./Form";
 
@@ -33,7 +32,6 @@ function Register({ onRegister }) {
       >
         <FormLinkEnter pathLink="/sign-in" />
       </Form>
-      <Footer />
     </div>
   );
 }

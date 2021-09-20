@@ -129,7 +129,10 @@ function App() {
     api
       .deleteCardUser(card._id)
       .then(() => {
-        setCards(cards.filter((c) => c._id !== card._id));
+        setCards((state) => state.filter((c) => c._id !== card._id));
+        /* Было setCards(cards.filter((c) => c._id !== card._id));
+        Рекомендация: изменять стейт лучше с помощью стейт-колбэка:
+        Тут в стейт-функцию передается стейт-колбэк, в котором 1м аргументом идет текущее состояние переменной. Вот ее и нужно использовать (менять) при изменениях,  так как бывают ситуации, что где-то уже изменили эту переменную, но еще не обновились данные в ней, а Вы попытаетесь изменить старые данные, которые неактуальны больше */
       })
       .catch((error) => {
         console.log(`Ошибка удаления карточки ${error}`);
@@ -159,13 +162,18 @@ function App() {
   const [infoTool, setInfoTool] = useState(false);
 
   const authToken = async (jwt) => {
-    return auth.getToken(jwt).then((res) => {
-      if (res) {
-        setLoggedIn(true);
-        setEmail(res.data.email);
-        history.push("/");
-      }
-    });
+    return auth
+      .getToken(jwt)
+      .then((res) => {
+        if (res) {
+          setLoggedIn(true);
+          setEmail(res.data.email);
+          history.push("/");
+        }
+      })
+      .catch((error) => {
+        console.log(`Ошибка данных ${error}`);
+      });
   };
 
   useEffect(() => {
@@ -185,7 +193,6 @@ function App() {
       .then((res) => {
         setMessage("Вы успешно зарегистрировались");
         setImage(true);
-        setInfoTool(true);
 
         setTimeout(function () {
           closeAllPopups();
@@ -198,11 +205,13 @@ function App() {
       .catch((error) => {
         setMessage("Что-то пошло не так! Попробуйте ещё раз.");
         setImage(false);
-        setInfoTool(true);
 
         if (error.status === 400) {
           return console.log("не передано одно из полей");
         }
+      })
+      .finally(() => {
+        setInfoTool(true);
       });
   }
 
@@ -220,7 +229,7 @@ function App() {
         }
       })
       .catch((error) => {
-        console.log(error);
+        console.log(`Ошибка данных ${error}`);
       });
   }
 
@@ -230,6 +239,24 @@ function App() {
     setLoggedIn(false);
     history.push("/sign-in");
   }
+
+  // Обработчик закрытия по Esc=============================================
+  /* Объявляем функцию внутри useEffect, чтобы она не теряла свою ссылку при обновлении компонента.
+  И не забываем удалять обработчик в clean up функции через return
+  А также пустой массив зависимостей, чтобы только 1 раз навесить и не трогать
+  его при обновлении компонента. Он будет удаляться только при размонтировании компонента.
+*/
+  useEffect(() => {
+    const closeByEscape = (e) => {
+      if (e.key === "Escape") {
+        closeAllPopups();
+      }
+    };
+
+    document.addEventListener("keydown", closeByEscape);
+
+    return () => document.removeEventListener("keydown", closeByEscape);
+  }, []);
 
   return (
     <CurrentUserContext.Provider value={currentUser}>

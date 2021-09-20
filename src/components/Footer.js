@@ -1,7 +1,7 @@
 import React from "react";
 
 export default function Footer() {
-  let today = new Date();
+  const today = new Date();
   let year = today.getFullYear();
   return (
     <footer className="footer page__cover">
